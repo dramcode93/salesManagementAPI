@@ -22,7 +22,7 @@ const productSchema = new schema(
     },
     category: {
     type: Schema.ObjectId,
-    ref: "categories",
+    ref: "categoryModel",
     required: [true, "Category Must Be Required"],
     },
 },
