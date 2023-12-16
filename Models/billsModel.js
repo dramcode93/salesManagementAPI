@@ -8,11 +8,11 @@ const billSchema = new Schema({
         type:Number,
         required:[true,"phone Number is required"],
     },
-    products:[{ 
-        name:String,
-        quantity:Number,
-        price:Number,
-    }],
+    products:{
+        type:Schema.ObjectId,
+        ref:"productModel",
+        required:[true,"Products required"],
+    },
 },{timestamps:true});
 
 export default model("billModel", billSchema);

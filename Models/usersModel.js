@@ -11,14 +11,11 @@ const userSchema = new Schema(
     unique: true,
     lowercase: true,
     },
-    phone:{
-        type:String,
-        required:[true,"User Phone is Required"],
-    },
     password: {
     type: String,
     required: [true, "password is required"],
-    minilength: [6, "too short password"],
+    minlength: [6, "too short password"],
+    maxlength:[14,"too long password"],
     },
     passwordChangedAt: Date,
 },
