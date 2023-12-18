@@ -16,6 +16,10 @@ export const getCategoryValidator = [
 
 export const updateCategoryValidator = [
     check('categoryId').isMongoId().withMessage("Invalid Id"),
+    check('name')
+        .notEmpty().withMessage("Category Name is required")
+        .isLength({ min: 2, max: 50 })
+        .withMessage("Name length must be between 2 and 50"),
     validatroMiddleware,
 ];
 
