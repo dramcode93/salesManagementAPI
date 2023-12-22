@@ -8,11 +8,15 @@ const productSchema = new Schema(
             maxlength: [50, "max length must be 50 char"],
             required: [true, "Product Name is Required"],
         },
+        slug: {
+            type: String,
+            lowercase: true
+        },
         quantity: {
             type: Number,
             default: 0,
             trim: true,
-            required: [true, "Product Quantity is Requried"],
+            required: [true, "Product Quantity is Required"],
         },
         price: {
             type: Number,

@@ -8,7 +8,7 @@ import billsRouter from './routes/billsRoute.js'
 import usersRouter from './routes/usersRoute.js'
 import { DBConnection } from "./config/mongoDB.js";
 import { APIerrors } from "./utils/errors.js"
-import { globalError } from "./middlewares/globaelErrores.js";
+import { globalError } from "./middlewares/globalErrors.js";
 
 const app = express();
 app.use(express.json());

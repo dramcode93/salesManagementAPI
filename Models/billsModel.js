@@ -7,14 +7,15 @@ const billSchema = new Schema({
         maxlength: [50, "max length must be 50 char"],
         required: [true, "customerName is Required"],
     },
-    phone: {
-        type: Number,
-        required: [true, "phone Number is required"],
+    slug: {
+        type: String,
+        lowercase: true
     },
+    phone: { type: String },
     products: [{
         type: Schema.ObjectId,
         ref: "productModel",
-        required: [true, "Products required"],
+        required: [true, "Products are required"],
     }],
 },
     { timestamps: true });

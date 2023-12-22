@@ -1,14 +1,15 @@
-import { allProductCat, addsubProductNest, createProduct, AllProduct, ProductId, updateProduct, deleteProduct } from '../controllers/product.js'
+import { allProductCat, addSubProductNest, createProduct, AllProduct, ProductId, updateProduct, deleteProduct } from '../controllers/product.js'
 import { Router } from "express";
+import { createProductValidator, deleteProductValidator, getProductValidator, updateProductValidator } from '../utils/validation/productValidator.js';
 const router = new Router({ mergeParams: true });
 
 router.route('/')
     .get(allProductCat, AllProduct)
-    .post(addsubProductNest, createProduct)
+    .post(addSubProductNest, createProductValidator, createProduct)
 
 router.route('/:id')
-    .get(ProductId)
-    .put(updateProduct)
-    .delete(deleteProduct)
+    .get(getProductValidator, ProductId)
+    .put(updateProductValidator, updateProduct)
+    .delete(deleteProductValidator, deleteProduct)
 
 export default router

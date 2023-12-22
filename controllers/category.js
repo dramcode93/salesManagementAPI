@@ -1,7 +1,7 @@
 import categoryModel from '../Models/categoryModel.js';
 import { deleteOne, updateOne, getAll, createOne, findOne } from '../controllers/refactorHandler.js'
 
-//  creat category post 
+//  create category post 
 export const createCategory = createOne(categoryModel);
 
 // view list category get 

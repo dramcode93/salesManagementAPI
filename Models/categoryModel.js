@@ -9,6 +9,10 @@ const categorySchema = new Schema(
             minlength: [2, "min length must be 2 char"],
             maxlength: [50, "max length must be 50 char"],
         },
+        slug: {
+            type: String,
+            lowercase: true
+        },
     },
     { timestamps: true }
 );
