@@ -3,8 +3,8 @@ import asyncHandler from 'express-async-handler';
 import { deleteOne, getAll, createOne, findOne } from '../controllers/refactorHandler.js'
 import bcrypt from 'bcryptjs'
 
-//  creat user post  private
-export const creatUser = createOne(userModel)
+//  create user post  private
+export const createUser = createOne(userModel)
 
 // view list user get  private
 export const userList = getAll(userModel)

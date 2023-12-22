@@ -1,36 +1,36 @@
 class ApiFeature {
-    constructor(moongoseQuery, queryString) {
-        this.moongoseQuery = moongoseQuery;
+    constructor(mongooseQuery, queryString) {
+        this.mongooseQuery = mongooseQuery;
         this.queryString = queryString;
     }
     //2)filter
     filter() {
         const queryStringObjObj = { ...this.queryString }
-        const executeFiled = ["page", "limit", "sort", "limitFields", "pagenation", "fields", "search"];
+        const executeFiled = ["page", "limit", "sort", "fields", "search"];
         executeFiled.forEach((filed) => { delete queryStringObjObj[filed] })
 
-        //filter usting gte|gt|lte|lt
+        //filter using gte|gt|lte|lt
         let queryStr = JSON.stringify(queryStringObjObj)
         queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`)
-        this.moongoseQuery = this.moongoseQuery.find(JSON.parse(queryStr))
+        this.mongooseQuery = this.mongooseQuery.find(JSON.parse(queryStr))
         return this;
     }
     //3) sort 
     sort() {
         if (this.queryString.sort) {
             const sortBy = this.queryString.sort.split(',').join(' ');
-            this.moongoseQuery = this.moongoseQuery.sort(sortBy)
+            this.mongooseQuery = this.mongooseQuery.sort(sortBy)
         } else {
-            this.moongoseQuery = this.moongoseQuery.sort('-createdAt')
+            this.mongooseQuery = this.mongooseQuery.sort('-createdAt')
         } return this;
     }
-    //4) fields limit "coulmn select"  
+    //4) fields limit "column select"
     limitFields() {
         if (this.queryString.fields) {
             const fields = this.queryString.fields.split(',').join(' ');
-            this.moongoseQuery = this.moongoseQuery.select(fields)
+            this.mongooseQuery = this.mongooseQuery.select(fields)
         } else {
-            this.moongoseQuery = this.moongoseQuery.select('-__v')
+            this.mongooseQuery = this.mongooseQuery.select('-__v')
         }
         return this;
     }
@@ -38,41 +38,41 @@ class ApiFeature {
     // 5) search   
     search(modelName) {
         if (this.queryString.search) {
-            let querys = {};
+            let query = {};
             if (modelName === "billModel") {
-                querys = { customerName: { $regex: this.queryString.search, $options: "i" } }
+                query = { customerName: { $regex: this.queryString.search, $options: "i" } }
 
             }
             else {
-                querys = { name: { $regex: this.queryString.search, $options: "i" } }
+                query = { name: { $regex: this.queryString.search, $options: "i" } }
             }
-            this.moongoseQuery = this.moongoseQuery.find(querys)
+            this.mongooseQuery = this.mongooseQuery.find(query)
         }
         return this;
     }
     //2)pagination
-    pagenation(countDocument) {
+    pagination(countDocument) {
         const page = this.queryString.page * 1 || 1;
         const limit = this.queryString.limit * 1 || 50;
         const skip = (page - 1) * limit;
         const endIndex = page * limit;
-        // pagenation result
-        const pagenation = {}
-        pagenation.currentPge = page;
-        pagenation.limit = limit;
-        pagenation.numberOfPage = Math.ceil(countDocument / limit)
+        // pagination result
+        const pagination = {}
+        pagination.currentPge = page;
+        pagination.limit = limit;
+        pagination.numberOfPage = Math.ceil(countDocument / limit)
         //next page
         if (endIndex < countDocument) {
-            pagenation.next = page + 1;
+            pagination.next = page + 1;
         }
         if (skip > 0) {
-            pagenation.prev = page - 1;
+            pagination.prev = page - 1;
         }
 
 
 
-        this.moongoseQuery = this.moongoseQuery.skip(skip).limit(limit)
-        this.pagenationResult = pagenation;
+        this.mongooseQuery = this.mongooseQuery.skip(skip).limit(limit)
+        this.paginationResult = pagination;
         return this
     }
 

@@ -4,7 +4,7 @@ import { deleteOne, updateOne, getAll, createOne, findOne } from '../controllers
 
 
 
-//  creat Bills post 
+//  create Bills post 
 export const createBills = createOne(billModel);
 
 // view list Bills get 

@@ -1,20 +1,19 @@
 import asyncHandler from 'express-async-handler';
-import {APIerrors} from '../utils/errors.js';
+import { APIerrors } from '../utils/errors.js';
 import ApiFeature from '../utils/apiFeature.js';
 
 
 export const deleteOne = (Model) => asyncHandler(async (req, res, next) => {
     const DocumentDelete = await Model.findByIdAndDelete(req.params.id)
     if (!DocumentDelete) {
-        return next(new APIerrors(`error on id ${id}`, 404));
+        return next(new APIerrors(`No item for this id ${req.params.id}`, 404));
     }
-    res.json({ data: DocumentDelete });
+    res.status(204).json({ status: "success" });
     next();
 })
 
 export const updateOne = (Model) =>
     asyncHandler(async (req, res, next) => {
-        console.log(req.body)
         const document = await Model.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
         });
@@ -30,9 +29,9 @@ export const updateOne = (Model) =>
 export const findOne = (Model) => asyncHandler(async (req, res, next) => {
     const one = await Model.findById(req.params.id)
     if (!one) {
-        return next(new APIerrors(`error on id`, 404));
+        return next(new APIerrors(`No item for this id `, 404));
     }
-    res.status(200).json({data: one })
+    res.status(200).json({ data: one })
 })
 
 export const createOne = (Model) => asyncHandler(async (req, res) => {
@@ -43,11 +42,13 @@ export const createOne = (Model) => asyncHandler(async (req, res) => {
 
 
 export const getAll = (Model, modelName) => asyncHandler(async (req, res) => {
-    const documenCount = await Model.countDocuments();
-    const apiFeature = new ApiFeature(Model.find(), req.query).pagenation(documenCount).filter().sort().limitFields().search(modelName)
+    let filterData = {};
+    if (req.filterData) { filterData = req.filterData }
+    const documentCount = await Model.countDocuments();
+    const apiFeature = new ApiFeature(Model.find(filterData), req.query).pagination(documentCount).filter().sort().limitFields().search(modelName)
 
     //execute query
-    const { moongoseQuery, pagenationResult } = apiFeature;
-    const proList = await moongoseQuery;
-    res.json({ results: proList.length, pagenationResult, data: proList });
+    const { mongooseQuery, paginationResult } = apiFeature;
+    const proList = await mongooseQuery;
+    res.json({ results: proList.length, paginationResult, data: proList });
 })

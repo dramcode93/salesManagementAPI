@@ -1,4 +1,4 @@
-import { creatUser, userList, userId, updateUser, deleteUser, changeUserPassword } from "../controllers/user.js"
+import { createUser, userList, userId, updateUser, deleteUser, changeUserPassword } from "../controllers/user.js"
 
 import { Router } from "express";
 const router = new Router();
@@ -6,7 +6,7 @@ const router = new Router();
 
 router.route('/')
     .get(userList)
-    .post(creatUser)
+    .post(createUser)
 
 router.route('/:id')
     .get(userId)

@@ -3,7 +3,7 @@ import { deleteOne, updateOne, getAll, createOne, findOne } from '../controllers
 
 
 
-export const addsubProductNest = (req, res, next) => {
+export const addSubProductNest = (req, res, next) => {
     //  nest route if not send catId with name of product
     if (!req.body.category) req.body.category = req.params.categoryId;
     next();
@@ -12,14 +12,14 @@ export const addsubProductNest = (req, res, next) => {
 // middleWare to create product if not write catId
 export const allProductCat = (req, res, next) => {
     // nest route  (product &category)
-    //  get   /api/category/:categoryid/product
-    var filterObject = {};
-    if (req.params.categoryId) { filterObject = { category: req.params.categoryId } }
-    req.filterObj = filterObject;
+    //  get   /api/category/:categoryId/product
+    let filterData = {};
+    if (req.params.categoryId) { filterData = { category: req.params.categoryId } }
+    req.filterData = filterData;
     next();
 }
 
-//  creat Product post 
+//  create Product post 
 export const createProduct = createOne(productModel);
 
 // view list Product get 
