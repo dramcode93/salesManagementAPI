@@ -20,4 +20,9 @@ const billSchema = new Schema({
 },
     { timestamps: true });
 
+billSchema.pre(/^find/, function (next) {
+    this.populate({ path: 'products', select: 'name price -_id' });
+    next();
+})
+
 export default model("billModel", billSchema);
