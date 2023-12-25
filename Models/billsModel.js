@@ -13,15 +13,19 @@ const billSchema = new Schema({
     },
     phone: { type: String },
     products: [{
-        type: Schema.ObjectId,
-        ref: "productModel",
-        required: [true, "Products are required"],
+        product: {
+            type: Schema.ObjectId,
+            ref: "productModel",
+            required: [true, "Products are required"]
+        },
+        productQuantity: { type: Number },
+        totalPrice: { type: Number }
     }],
 },
     { timestamps: true });
 
 billSchema.pre(/^find/, function (next) {
-    this.populate({ path: 'products', select: 'name price -_id' });
+    this.populate({ path: 'products.product', select: 'name price -_id' });
     next();
 })
 
