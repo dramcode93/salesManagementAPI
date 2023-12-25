@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 import categoriesRouter from './routes/categoriesRoute.js'
 import productsRouter from './routes/productsRoute.js'
@@ -12,6 +13,7 @@ import { globalError } from "./middlewares/globalErrors.js";
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 dotenv.config();
 DBConnection()
 const server = app.listen(process.env.port, () => { console.log(`app is listen on port ${process.env.port}`); });
