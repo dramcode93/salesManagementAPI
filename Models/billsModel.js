@@ -25,7 +25,7 @@ const billSchema = new Schema({
     { timestamps: true });
 
 billSchema.pre(/^find/, function (next) {
-    this.populate({ path: 'products.product', select: 'name price -_id' });
+    this.populate({ path: 'products.product', select: 'name price' });
     next();
 })
 
