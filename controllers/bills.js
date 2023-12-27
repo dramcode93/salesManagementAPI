@@ -56,6 +56,7 @@ export const updateBills = expressAsyncHandler(async (req, res) => {
     const productQuantityMap = req.body.productQuantityMap || {};
     const products = req.body.products
     if (products) {
+        const bill = await billModel.findById(req.params.id);
         const productDetailsPromises = products.map(async (productData) => {
             const productId = productData.product;
             const requestedQuantity = productQuantityMap[productId] || 0;
@@ -71,7 +72,6 @@ export const updateBills = expressAsyncHandler(async (req, res) => {
                 throw (new Error(`Invalid quantity for product: ${product.name}`));
             }
 
-            const bill = await billModel.findById(req.params.id);
             let quantityDifference;
             const existingProduct = bill.products.find((billProduct) => billProduct.product._id.toString() === productId.toString());
             if (existingProduct) { quantityDifference = -(existingProduct.productQuantity - requestedQuantity); }
