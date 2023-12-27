@@ -1,20 +1,25 @@
 import { Router } from "express";
 import { protectRoutes } from "../controllers/auth.js";
-import { createUser, userList, userId, updateUser, deleteUser, changeUserPassword } from "../controllers/user.js"
+import { userId, getLoggedUserData, updateLoggedUser, updateLoggedUserPassword } from "../controllers/user.js"
+import { getUserValidator, updateLoggedUserPasswordValidator, updateLoggedUserValidator } from "../utils/validation/userValidator.js";
 
 const router = new Router();
 router.use(protectRoutes)
 
-router.route('/')
-    .get(userList)
-    .post(createUser)
+router.get('/getMe', getLoggedUserData, getUserValidator, userId)
+router.put('/updateMe', updateLoggedUserValidator, updateLoggedUser)
+router.put('/updateMyPassword', updateLoggedUserPasswordValidator, updateLoggedUserPassword)
 
-router.route('/:id')
-    .get(userId)
-    .put(updateUser)
-    .delete(deleteUser)
+// router.route('/')
+//     .get(userList)
+//     .post(createUser)
 
-router.put('/changeUserPassword/:id', changeUserPassword)
+// router.route('/:id')
+//     .get(userId)
+//     .put(updateUser)
+//     .delete(deleteUser)
+
+// router.put('/changeUserPassword/:id', changeUserPassword)
 
 
 export default router
