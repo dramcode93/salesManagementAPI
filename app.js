@@ -11,7 +11,6 @@ import usersRouter from './routes/usersRoute.js';
 import { DBConnection } from "./config/mongoDB.js";
 import { APIerrors } from "./utils/errors.js";
 import { globalError } from "./middlewares/globalErrors.js";
-import { protectRoutes } from "./controllers/auth.js";
 
 const app = express();
 app.use(express.json());
@@ -22,7 +21,6 @@ const server = app.listen(process.env.port, () => { console.log(`app is listen o
 
 // Routes
 app.use('/api/auth', authRouter);
-app.use(protectRoutes)
 app.use('/api/categories', categoriesRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/customers', customersRouter);
