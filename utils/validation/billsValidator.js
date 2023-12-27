@@ -1,6 +1,5 @@
 import { check } from "express-validator";
 import slugify from "slugify";
-import productModel from '../../Models/productsModel.js'
 import { validatorMiddleware } from "../../middlewares/validatorMiddleware.js";
 
 export const createBillsValidator = [

@@ -2,14 +2,16 @@ import express from "express";
 import dotenv from 'dotenv';
 import cors from 'cors';
 
-import categoriesRouter from './routes/categoriesRoute.js'
-import productsRouter from './routes/productsRoute.js'
-import customersRouter from './routes/customersRoute.js'
-import billsRouter from './routes/billsRoute.js'
-import usersRouter from './routes/usersRoute.js'
+import categoriesRouter from './routes/categoriesRoute.js';
+import productsRouter from './routes/productsRoute.js';
+import customersRouter from './routes/customersRoute.js';
+import billsRouter from './routes/billsRoute.js';
+import authRouter from './routes/authRoute.js';
+import usersRouter from './routes/usersRoute.js';
 import { DBConnection } from "./config/mongoDB.js";
-import { APIerrors } from "./utils/errors.js"
+import { APIerrors } from "./utils/errors.js";
 import { globalError } from "./middlewares/globalErrors.js";
+import { protectRoutes } from "./controllers/auth.js";
 
 const app = express();
 app.use(express.json());
@@ -19,6 +21,8 @@ DBConnection()
 const server = app.listen(process.env.port, () => { console.log(`app is listen on port ${process.env.port}`); });
 
 // Routes
+app.use('/api/auth', authRouter);
+app.use(protectRoutes)
 app.use('/api/categories', categoriesRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/customers', customersRouter);
