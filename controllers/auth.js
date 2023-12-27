@@ -35,8 +35,8 @@ export const protectRoutes = expressAsyncHandler(async (req, res, next) => {
 
     // Check if user change his password
     if (user.passwordChangedAt) {
-        const changedPasswordTime = parent(user.passwordChangedAt.getTime() / 1000, 10)
-        if (changedPasswordTime > decoded.iat) { return next(APIerrors('Your password has been updated since you logged in last time. \nPlease log in again.', 403)) }
+        const changedPasswordTime = parseInt(user.passwordChangedAt.getTime() / 1000, 10)
+        if (changedPasswordTime > decoded.iat) { return next(new APIerrors('Your password has been updated since you logged in last time. Please log in again.', 403)) }
     }
 
     // Attach the user to the request object
