@@ -1,7 +1,9 @@
+import crypto from 'crypto';
 import expressAsyncHandler from "express-async-handler";
 import Jwt from "jsonwebtoken";
-import bcrypt from 'bcryptjs'
-import createToken from '../utils/createToken.js'
+import bcrypt from 'bcryptjs';
+import { createToken, createResetToken } from '../utils/createToken.js';
+import sendEmail from "../utils/sendEmail.js";
 import { APIerrors } from "../utils/errors.js";
 import usersModel from "../Models/usersModel.js";
 
@@ -40,4 +42,83 @@ export const protectRoutes = expressAsyncHandler(async (req, res, next) => {
     // Attach the user to the request object
     req.user = user;
     next();
+})
+
+export const forgetPassword = expressAsyncHandler(async (req, res, next) => {
+
+    // Get the user by email
+    const user = await usersModel.findOne({ email: req.body.email });
+    if (!user) { return next(new APIerrors('No account with this email address exists.', 400)) }
+
+    // Create a random reset code from 6 numbers
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const hashedResetCode = crypto.createHash('sha256').update(resetCode).digest('hex');
+
+    // set the hashed reset code in user DB
+    user.passwordResetCode = hashedResetCode;
+
+    // set expire time for reset code
+    user.passwordResetCodeExpires = Date.now() + (10 * 60 * 1000);
+    user.passwordResetCodeVerify = false;
+
+    // Save the updated Data
+    await user.save({ validateBeforeSave: false })
+
+    // Send the reset code to email
+    const message = `مرحبا ${user.name}
+    رمز التحقق الخاص بك هو ${resetCode}`;
+    try {
+        await sendEmail({
+            email: user.email,
+            subject: 'تغيير كلمة المرور',
+            message
+        })
+    } catch (err) {
+        user.passwordResetCode = undefined;
+        user.passwordResetCodeExpires = undefined;
+        user.passwordResetCodeVerify = undefined;
+        await user.save({ validateBeforeSave: false });
+        return next(new APIerrors('Error while sending a password reset code... try again later'));
+    }
+    const resetToken = createResetToken(user._id);
+    res.status(200).json({ success: true, resetToken, msg: 'check your email' });
+})
+
+export const verifyResetPasswordCode = expressAsyncHandler(async (req, res, next) => {
+    let resetToken;
+    if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+        resetToken = req.headers.authorization.split(' ')[1];
+    }
+    if (!resetToken) { return next(new APIerrors('You do not have permission to verify reset code.', 400)); }
+
+    const decodedToken = Jwt.verify(resetToken, process.env.JWT_RESET_PASSWORD_SECRET_KEY)
+
+    const hashedResetCode = crypto.createHash('sha256').update(req.body.resetCode).digest('hex');
+
+    const user = await usersModel.findOne({ _id: decodedToken._id, passwordResetCode: hashedResetCode, passwordResetCodeExpires: { $gt: Date.now() } });
+    if (!user) { return next(new APIerrors('Invalid or expired reset code')) };
+    user.passwordResetCodeVerify = true;
+    await user.save({ validateBeforeSave: false });
+    res.status(200).json({ success: true, resetToken, data: user });
+})
+
+export const resetPassword = expressAsyncHandler(async (req, res, next) => {
+    let resetToken;
+    if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+        resetToken = req.headers.authorization.split(' ')[1];
+    }
+    if (!resetToken) { return next(new APIerrors('You do not have permission to verify reset code.', 400)); }
+
+    const decodedToken = Jwt.verify(resetToken, process.env.JWT_RESET_PASSWORD_SECRET_KEY)
+
+    const user = await usersModel.findOne({ _id: decodedToken._id, passwordResetCodeVerify: true });
+    if (!user) { return next(new APIerrors('Please verify your email first', 400)); }
+    user.password = req.body.newPassword;
+    user.passwordResetCode = undefined;
+    user.passwordResetCodeExpires = undefined;
+    user.passwordResetCodeVerify = undefined;
+    user.passwordChangedAt = Date.now();
+
+    await user.save({ validateBeforeSave: false });
+    res.status(200).json({ success: true, data: "Password has been changed" });
 })

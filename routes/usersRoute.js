@@ -1,8 +1,9 @@
+import { Router } from "express";
+import { protectRoutes } from "../controllers/auth.js";
 import { createUser, userList, userId, updateUser, deleteUser, changeUserPassword } from "../controllers/user.js"
 
-import { Router } from "express";
 const router = new Router();
-
+router.use(protectRoutes)
 
 router.route('/')
     .get(userList)

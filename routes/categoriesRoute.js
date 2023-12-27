@@ -1,10 +1,12 @@
-import { createCategory, AllCategory, categoryId, updateCategory, deleteCategory } from '../controllers/category.js'
 import { Router } from "express";
 import productsRouter from './productsRoute.js'
+import { createCategory, AllCategory, categoryId, updateCategory, deleteCategory } from '../controllers/category.js'
 import { createCategoryValidator, deleteCategoryValidator, getCategoryValidator, updateCategoryValidator } from '../utils/validation/categoryValidator.js';
+import { protectRoutes } from '../controllers/auth.js';
 
 const router = new Router();
 router.use('/:categoryId/products', productsRouter)
+router.use(protectRoutes)
 
 router.route('/')
     .get(AllCategory)
