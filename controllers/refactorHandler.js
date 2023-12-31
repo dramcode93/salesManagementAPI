@@ -9,7 +9,6 @@ export const deleteOne = (Model) => asyncHandler(async (req, res, next) => {
         return next(new APIerrors(`No item for this id ${req.params.id}`, 404));
     }
     res.status(204).json({ status: "success" });
-    next();
 })
 
 export const updateOne = (Model) =>
@@ -23,6 +22,7 @@ export const updateOne = (Model) =>
                 new APIerrors(`No document for this id ${req.params.id}`, 404)
             );
         }
+        console.log(document );
         res.status(200).json({ data: document });
     });
 
