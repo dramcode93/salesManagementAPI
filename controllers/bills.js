@@ -12,12 +12,8 @@ export const createBills = expressAsyncHandler(async (req, res, next) => {
         const productId = productData.product;
         const requestedQuantity = productQuantityMap[productId] || 0;
 
-        // Check if the product exists in DB
+        // Get product
         const product = await productsModel.findById(productId);
-        if (!product) { return Promise.reject(new Error(`Product not found for ID: ${productId}`)); }
-
-        // Check for the quantity of products
-        if (requestedQuantity <= 0 || requestedQuantity > product.quantity) { return Promise.reject(new Error(`Invalid quantity for product: ${product.name}`)); }
 
         // Update the product quantity in the database
         await productsModel.findByIdAndUpdate(productId, {
@@ -72,12 +68,8 @@ export const updateBills = expressAsyncHandler(async (req, res) => {
             const productId = productData.product;
             const requestedQuantity = productQuantityMap[productId] || 0;
 
-            // Check if the product exists in DB
+            // Get product
             const product = await productsModel.findById(productId);
-            if (!product) { throw (new Error(`Product not found for ID: ${productId}`)); }
-
-            // Check for the quantity of products
-            if (requestedQuantity <= 0 || requestedQuantity > product.quantity) { throw (new Error(`Invalid quantity for product: ${product.name}`)); }
 
             // update products quantity
             let quantityDifference;
