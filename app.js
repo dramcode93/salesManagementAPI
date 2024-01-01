@@ -18,8 +18,9 @@ app.use(express.json());
 app.use(cors());
 app.use(compression());
 dotenv.config();
-DBConnection()
-const server = app.listen(process.env.port, () => { console.log(`app is listen on port ${process.env.port}`); });
+
+let server;
+DBConnection().then(() => { server = app.listen(process.env.port, () => { console.log(`app is listen on port ${process.env.port}`); }); })
 
 // Routes
 app.use('/api/auth', authRouter);

@@ -4,7 +4,7 @@ import billModel from '../Models/billsModel.js'
 import productsModel from '../Models/productsModel.js';
 
 //  create Bills post 
-export const createBills = expressAsyncHandler(async (req, res) => {
+export const createBills = expressAsyncHandler(async (req, res, next) => {
 
     const productQuantityMap = req.body.productQuantityMap || {};
     const products = req.body.products
@@ -14,14 +14,10 @@ export const createBills = expressAsyncHandler(async (req, res) => {
 
         // Check if the product exists in DB
         const product = await productsModel.findById(productId);
-        if (!product) {
-            return Promise.reject(new Error(`Product not found for ID: ${productId}`));
-        }
+        if (!product) { return Promise.reject(new Error(`Product not found for ID: ${productId}`)); }
 
         // Check for the quantity of products
-        if (requestedQuantity <= 0 || requestedQuantity > product.quantity) {
-            return Promise.reject(new Error(`Invalid quantity for product: ${product.name}`));
-        }
+        if (requestedQuantity <= 0 || requestedQuantity > product.quantity) { return Promise.reject(new Error(`Invalid quantity for product: ${product.name}`)); }
 
         // Update the product quantity in the database
         await productsModel.findByIdAndUpdate(productId, {
@@ -57,21 +53,33 @@ export const updateBills = expressAsyncHandler(async (req, res) => {
     const products = req.body.products
     if (products) {
         const bill = await billModel.findById(req.params.id);
+
+        // Check if product in bill sent in body or no
+        const arrayOfValues = products.map(obj => Object.values(obj));
+        const flattenedValues = arrayOfValues.flat();
+        bill.products.forEach(async (checkProduct) => {
+            if (!(flattenedValues.includes(checkProduct.product._id.toString()))) {
+                const updateFields = {
+                    quantity: checkProduct.productQuantity,
+                    sold: -checkProduct.productQuantity,
+                }
+                await productsModel.findByIdAndUpdate(checkProduct.product._id, { $inc: updateFields });
+            }
+        });
+
+        // update bill
         const productDetailsPromises = products.map(async (productData) => {
             const productId = productData.product;
             const requestedQuantity = productQuantityMap[productId] || 0;
 
             // Check if the product exists in DB
             const product = await productsModel.findById(productId);
-            if (!product) {
-                throw (new Error(`Product not found for ID: ${productId}`));
-            }
+            if (!product) { throw (new Error(`Product not found for ID: ${productId}`)); }
 
             // Check for the quantity of products
-            if (requestedQuantity <= 0 || requestedQuantity > product.quantity) {
-                throw (new Error(`Invalid quantity for product: ${product.name}`));
-            }
+            if (requestedQuantity <= 0 || requestedQuantity > product.quantity) { throw (new Error(`Invalid quantity for product: ${product.name}`)); }
 
+            // update products quantity
             let quantityDifference;
             const existingProduct = bill.products.find((billProduct) => billProduct.product._id.toString() === productId.toString());
             if (existingProduct) { quantityDifference = -(existingProduct.productQuantity - requestedQuantity); }
