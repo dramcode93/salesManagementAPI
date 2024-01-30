@@ -19,6 +19,13 @@ app.use(cors());
 app.use(compression());
 dotenv.config();
 
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
+
 let server;
 DBConnection().then(() => { server = app.listen(process.env.port, () => { console.log(`app is listen on port ${process.env.port}`); }); })
 

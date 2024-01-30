@@ -74,6 +74,7 @@ export const forgetPassword = expressAsyncHandler(async (req, res, next) => {
             message
         })
     } catch (err) {
+        console.log(err);
         user.passwordResetCode = undefined;
         user.passwordResetCodeExpires = undefined;
         user.passwordResetCodeVerify = undefined;
