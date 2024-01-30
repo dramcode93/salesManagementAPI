@@ -14,7 +14,7 @@ import { APIerrors } from "./utils/errors.js";
 import { globalError } from "./middlewares/globalErrors.js";
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '2kb' }));
 app.use(cors());
 app.use(compression());
 dotenv.config();
