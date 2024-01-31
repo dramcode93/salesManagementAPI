@@ -2,6 +2,9 @@ import express from "express";
 import dotenv from 'dotenv';
 import cors from 'cors';
 import compression from "compression";
+import hpp from "hpp";
+import ExpressMongoSanitize from "express-mongo-sanitize";
+import helmet from "helmet";
 
 import categoriesRouter from './routes/categoriesRoute.js';
 import productsRouter from './routes/productsRoute.js';
@@ -15,6 +18,9 @@ import { globalError } from "./middlewares/globalErrors.js";
 
 const app = express();
 app.use(express.json({ limit: '2kb' }));
+app.use(ExpressMongoSanitize())
+app.use(helmet())
+app.use(hpp({ whitelist: ['price', 'quantity', 'name', 'customerName'] }))
 app.use(cors());
 app.use(compression());
 dotenv.config();

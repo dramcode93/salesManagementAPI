@@ -1,11 +1,15 @@
 import categoryModel from '../Models/categoryModel.js';
-import { deleteOne, updateOne, getAll, createOne, findOne } from '../controllers/refactorHandler.js'
+import { deleteOne, updateOne, getAll, createOne, findOne, getAllList } from '../controllers/refactorHandler.js'
 
 //  create category post 
 export const createCategory = createOne(categoryModel);
 
 // view list category get 
 export const AllCategory = getAll(categoryModel,"categoryModel")
+
+// view list category get 
+export const AllCategoryList = getAllList(categoryModel)
+
 // find category with id get
 export const categoryId = findOne(categoryModel)
 

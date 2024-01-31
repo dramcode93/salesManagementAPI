@@ -22,7 +22,7 @@ export const updateOne = (Model) =>
                 new APIerrors(`No document for this id ${req.params.id}`, 404)
             );
         }
-        console.log(document );
+        console.log(document);
         res.status(200).json({ data: document });
     });
 
@@ -51,4 +51,15 @@ export const getAll = (Model, modelName) => asyncHandler(async (req, res) => {
     const { mongooseQuery, paginationResult } = apiFeature;
     const proList = await mongooseQuery;
     res.json({ results: proList.length, paginationResult, data: proList });
+})
+
+export const getAllList = (Model) => asyncHandler(async (req, res) => {
+    let filterData = {};
+    if (req.filterData) { filterData = req.filterData }
+    const apiFeature = new ApiFeature(Model.find(filterData), req.query).sort()
+
+    //execute query
+    const { mongooseQuery } = apiFeature;
+    const proList = await mongooseQuery;
+    res.json({ results: proList.length, data: proList });
 })
