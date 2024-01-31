@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import { createToken, createResetToken } from '../utils/createToken.js';
 import sendEmail from "../utils/sendEmail.js";
 import { APIerrors } from "../utils/errors.js";
+import { sanitizeUser } from '../utils/sanitization.js';
 import usersModel from "../Models/usersModel.js";
 
 
@@ -14,7 +15,7 @@ export const login = expressAsyncHandler(async (req, res, next) => {
         return next(new APIerrors('Invalid email or password', 401))
     }
     const token = createToken(user._id)
-    res.status(200).json({ user, token })
+    res.status(200).json({ user: sanitizeUser(user), token })
 })
 
 export const protectRoutes = expressAsyncHandler(async (req, res, next) => {
@@ -40,7 +41,7 @@ export const protectRoutes = expressAsyncHandler(async (req, res, next) => {
     }
 
     // Attach the user to the request object
-    req.user = user;
+    req.user = sanitizeUser(user);
     next();
 })
 
@@ -100,7 +101,7 @@ export const verifyResetPasswordCode = expressAsyncHandler(async (req, res, next
     if (!user) { return next(new APIerrors('Invalid or expired reset code')) };
     user.passwordResetCodeVerify = true;
     await user.save({ validateBeforeSave: false });
-    res.status(200).json({ success: true, resetToken, data: user });
+    res.status(200).json({ success: true, resetToken, data: sanitizeUser(user) });
 })
 
 export const resetPassword = expressAsyncHandler(async (req, res, next) => {

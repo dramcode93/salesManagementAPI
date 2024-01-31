@@ -1,5 +1,5 @@
 import productModel from '../Models/productsModel.js'
-import { deleteOne, updateOne, getAll, createOne, findOne } from '../controllers/refactorHandler.js'
+import { deleteOne, updateOne, getAll, createOne, findOne, getAllList } from '../controllers/refactorHandler.js'
 
 
 
@@ -24,6 +24,10 @@ export const createProduct = createOne(productModel);
 
 // view list Product get 
 export const AllProduct = getAll(productModel)
+
+// view list Product without pagination get 
+export const AllProductList = getAllList(productModel)
+
 // find Product with id get
 export const ProductId = findOne(productModel)
 

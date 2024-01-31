@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { allProductCat, addSubProductNest, createProduct, AllProduct, ProductId, updateProduct, deleteProduct } from '../controllers/product.js'
+import { allProductCat, addSubProductNest, createProduct, AllProduct, ProductId, updateProduct, deleteProduct, AllProductList } from '../controllers/product.js'
 import { createProductValidator, deleteProductValidator, getProductValidator, updateProductValidator } from '../utils/validation/productValidator.js';
 import { protectRoutes } from '../controllers/auth.js';
 
@@ -9,6 +9,8 @@ router.use(protectRoutes)
 router.route('/')
     .get(allProductCat, AllProduct)
     .post(addSubProductNest, createProductValidator, createProduct)
+
+router.get('/list', allProductCat, AllProductList)
 
 router.route('/:id')
     .get(getProductValidator, ProductId)
