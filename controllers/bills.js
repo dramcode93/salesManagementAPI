@@ -7,7 +7,8 @@ import productsModel from '../Models/productsModel.js';
 export const createBills = expressAsyncHandler(async (req, res, next) => {
 
     const productQuantityMap = req.body.productQuantityMap || {};
-    const products = req.body.products
+    const products = req.body.products;
+    let totalAmount = 0;
     const productDetailsPromises = products.map(async (productData) => {
         const productId = productData.product;
         const requestedQuantity = productQuantityMap[productId] || 0;
@@ -22,6 +23,7 @@ export const createBills = expressAsyncHandler(async (req, res, next) => {
                 sold: requestedQuantity
             }
         });
+        totalAmount = Number(totalAmount + (product.price * requestedQuantity));
 
         return {
             product: productData.product,
@@ -32,6 +34,8 @@ export const createBills = expressAsyncHandler(async (req, res, next) => {
     const productDetails = await Promise.all(productDetailsPromises);
 
     req.body.products = productDetails; // Update req.body.products with detailed information
+    req.body.totalAmount = totalAmount;
+    req.body.remainingAmount = totalAmount - req.body.paidAmount;
 
     const bill = await billModel.create(req.body)
     res.status(200).json({ data: bill })
@@ -49,17 +53,19 @@ export const updateBills = expressAsyncHandler(async (req, res) => {
     const products = req.body.products
     if (products) {
         const bill = await billModel.findById(req.params.id);
+        let totalAmount = 0;
 
         // Check if product in bill sent in body or no
         const arrayOfValues = products.map(obj => Object.values(obj));
         const flattenedValues = arrayOfValues.flat();
         bill.products.forEach(async (checkProduct) => {
-            if (!(flattenedValues.includes(checkProduct.product._id.toString()))) {
+            const productId = checkProduct?.product?._id;
+            if (productId != null && !(flattenedValues.includes(productId.toString()))) {
                 const updateFields = {
-                    quantity: checkProduct.productQuantity,
-                    sold: -checkProduct.productQuantity,
+                    quantity: checkProduct?.productQuantity,
+                    sold: -checkProduct?.productQuantity,
                 }
-                await productsModel.findByIdAndUpdate(checkProduct.product._id, { $inc: updateFields });
+                await productsModel.findByIdAndUpdate(productId, { $inc: updateFields });
             }
         });
 
@@ -73,7 +79,7 @@ export const updateBills = expressAsyncHandler(async (req, res) => {
 
             // update products quantity
             let quantityDifference;
-            const existingProduct = bill.products.find((billProduct) => billProduct.product._id.toString() === productId.toString());
+            const existingProduct = bill.products.find((billProduct) => billProduct?.product?._id.toString() === productId.toString());
             if (existingProduct) { quantityDifference = -(existingProduct.productQuantity - requestedQuantity); }
             else { quantityDifference = requestedQuantity }
             const updateFields = {
@@ -81,6 +87,8 @@ export const updateBills = expressAsyncHandler(async (req, res) => {
                 sold: quantityDifference,
             };
             await productsModel.findByIdAndUpdate(productId, { $inc: updateFields });
+            totalAmount = Number(totalAmount + (product.price * requestedQuantity));
+
             return {
                 product: productData.product,
                 productQuantity: requestedQuantity,
@@ -90,6 +98,8 @@ export const updateBills = expressAsyncHandler(async (req, res) => {
         const productDetails = await Promise.all(productDetailsPromises);
 
         req.body.products = productDetails; // Update req.body.products with detailed information
+        req.body.totalAmount = totalAmount;
+        req.body.remainingAmount = totalAmount - req.body.paidAmount;
     }
     const updatedBill = await billModel.findByIdAndUpdate(req.params.id, req.body, { new: true })
     res.status(200).json({ data: updatedBill })

@@ -21,6 +21,16 @@ const billSchema = new Schema({
         productQuantity: { type: Number },
         totalPrice: { type: Number }
     }],
+    totalAmount: { type: Number },
+    paidAmount: {
+        type: Number,
+        required: true
+    },
+    remainingAmount: {
+        type: Number,
+        default: 0
+    },
+
 },
     { timestamps: true });
 
