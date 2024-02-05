@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs'
 import { findOne } from '../controllers/refactorHandler.js'
 import { APIerrors } from '../utils/errors.js';
 import { createToken } from '../utils/createToken.js';
+import { sanitizeUser } from '../utils/sanitization.js';
 
 export const getLoggedUserData = asyncHandler(async (req, res, next) => {
     req.params.id = req.user._id;
@@ -11,7 +12,7 @@ export const getLoggedUserData = asyncHandler(async (req, res, next) => {
 })
 
 // find user with id get private
-export const userId = findOne(userModel)
+export const userId = findOne(userModel,'userModel')
 
 
 export const updateLoggedUser = asyncHandler(async (req, res, next) => {
@@ -20,7 +21,7 @@ export const updateLoggedUser = asyncHandler(async (req, res, next) => {
         email: req.body.email,
     }, { new: true, });
     if (!user) { return next(new APIerrors(`No user for this id ${req.params.id}`, 404)); }
-    res.status(200).json({ message: 'your Data updated successfully', data: user });
+    res.status(200).json({ message: 'your Data updated successfully', data: sanitizeUser(user) });
 });
 
 export const updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
@@ -30,7 +31,7 @@ export const updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
     }, { new: true, });
     if (!user) { return next(new APIerrors(`No user for this id ${req.params.id}`, 404)); }
     const token = createToken(user._id);
-    res.status(200).json({ message: 'your password updated successfully', data: user, token });
+    res.status(200).json({ message: 'your password updated successfully', data: sanitizeUser(user), token });
 });
 
 // view list user get  private

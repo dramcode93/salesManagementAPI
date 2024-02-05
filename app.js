@@ -18,11 +18,11 @@ import { globalError } from "./middlewares/globalErrors.js";
 
 const app = express();
 app.use(express.json({ limit: '2kb' }));
+app.use(cors());
+app.use(compression());
 app.use(ExpressMongoSanitize())
 app.use(helmet())
 app.use(hpp({ whitelist: ['price', 'quantity', 'name', 'customerName'] }))
-app.use(cors());
-app.use(compression());
 dotenv.config();
 
 let server;
