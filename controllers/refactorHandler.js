@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import { APIerrors } from '../utils/errors.js';
 import ApiFeature from '../utils/apiFeature.js';
+import { sanitizeUser } from '../utils/sanitization.js';
 
 
 export const deleteOne = (Model) => asyncHandler(async (req, res, next) => {
@@ -26,12 +27,12 @@ export const updateOne = (Model) =>
         res.status(200).json({ data: document });
     });
 
-export const findOne = (Model) => asyncHandler(async (req, res, next) => {
+export const findOne = (Model, modelName) => asyncHandler(async (req, res, next) => {
     const one = await Model.findById(req.params.id)
     if (!one) {
         return next(new APIerrors(`No item for this id `, 404));
     }
-    res.status(200).json({ data: one })
+    if (modelName == 'userModel') { res.status(200).json({ data: sanitizeUser(one) }) } else { res.status(200).json({ data: one }) }
 })
 
 export const createOne = (Model) => asyncHandler(async (req, res) => {
