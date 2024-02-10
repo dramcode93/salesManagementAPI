@@ -20,11 +20,11 @@ export const updateLoggedUserValidator = [
     check("email")
         .optional()
         .isEmail().withMessage("InValid Email Address")
-        .custom((val) =>
-            userModel.findOne({ email: val }).then((userModel) => {
-                if (userModel) { return Promise.reject(new Error("Email already in user")); }
+        .custom(async (val, { req }) => {
+            await userModel.findOne({ email: val }).then((userModel) => {
+                if (userModel && userModel._id.toString() != req.user._id) { return Promise.reject(new Error("Email already in user")); }
             })
-        ),
+        }),
     validatorMiddleware,
 ];
 
