@@ -44,8 +44,14 @@ export const createOne = (Model) => asyncHandler(async (req, res) => {
 
 export const getAll = (Model, modelName) => asyncHandler(async (req, res) => {
     let filterData = {};
+    let searchLength = 0;
     if (req.filterData) { filterData = req.filterData }
-    const documentCount = await Model.countDocuments();
+    if (req.query.search) {
+        const searchResult = new ApiFeature(Model.find(filterData), req.query).search(modelName);
+        const searchData = await searchResult.mongooseQuery;
+        searchLength = searchData.length;
+    }
+    const documentCount = searchLength || await Model.countDocuments();
     const apiFeature = new ApiFeature(Model.find(filterData), req.query).filter().sort().limitFields().search(modelName).pagination(documentCount)
 
     //execute query
