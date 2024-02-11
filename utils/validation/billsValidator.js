@@ -6,11 +6,17 @@ import productsModel from "../../Models/productsModel.js";
 export const createBillsValidator = [
     check('customerName')
         .notEmpty().withMessage("Customer Name is required")
-        .isLength({ min: 2, max: 50 }).withMessage("Name length must be between 2 and 50")
+        .isLength({ min: 2, max: 50 }).withMessage("Customer Name length must be between 2 and 50")
         .custom((val, { req }) => {
             req.body.slug = slugify(val);
             return true;
         }),
+    check("customerAddress")
+        .optional()
+        .isLength({ max: 200 }).withMessage("the max length of Customer Address is 200"),
+    check("sellerName")
+        .notEmpty().withMessage("Seller Name is Required")
+        .isLength({ min: 2, max: 50 }).withMessage("Seller Name Length must be between 2 and 50"),
     check("phone")
         .optional()
         .isMobilePhone("ar-EG").withMessage("InValid Phone Number only accept EG Number "),
@@ -45,6 +51,12 @@ export const updateBillValidator = [
             req.body.slug = slugify(val);
             return true;
         }),
+    check("customerAddress")
+        .optional()
+        .isLength({ max: 200 }).withMessage("the max length of Customer Address is 200"),
+    check("sellerName")
+        .optional()
+        .isLength({ min: 2, max: 50 }).withMessage("Seller Name Length must be between 2 and 50"),
     check("phone")
         .optional()
         .isMobilePhone("ar-EG").withMessage("InValid Phone Number only accept EG Number "),

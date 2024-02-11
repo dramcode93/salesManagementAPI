@@ -11,6 +11,18 @@ const billSchema = new Schema({
         type: String,
         lowercase: true
     },
+    customerAddress: {
+        type: String,
+        trim: true,
+        maxlength: [200, "max length must be 150 char"],
+    },
+    sellerName: {
+        type: String,
+        trim: true,
+        minlength: [2, "min length must be 2 char"],
+        maxlength: [50, "max length must be 50 char"],
+        required: [true, 'Seller Name is Required']
+    },
     phone: { type: String },
     products: [{
         product: {
