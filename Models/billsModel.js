@@ -42,12 +42,22 @@ const billSchema = new Schema({
         type: Number,
         default: 0
     },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: "userModel"
+    },
+    adminUser: {
+        type: Schema.Types.ObjectId,
+        ref: "userModel"
+    },
 
 },
     { timestamps: true });
 
 billSchema.pre(/^find/, function (next) {
     this.populate({ path: 'products.product', select: 'name price' });
+    this.populate({ path: 'adminUser', select: '_id name' });
+    this.populate({ path: 'user', select: '_id name' });
     next();
 })
 

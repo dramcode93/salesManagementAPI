@@ -10,9 +10,9 @@ import usersModel from "../Models/usersModel.js";
 
 
 export const login = expressAsyncHandler(async (req, res, next) => {
-    const user = await usersModel.findOne({ email: req.body.email })
+    const user = await usersModel.findOne({ name: req.body.name })
     if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
-        return next(new APIerrors('Invalid email or password', 401))
+        return next(new APIerrors('Invalid username or password', 401))
     }
     const token = createToken(user._id)
     res.status(200).json({ user: sanitizeUser(user), token })
@@ -43,6 +43,18 @@ export const protectRoutes = expressAsyncHandler(async (req, res, next) => {
     // Attach the user to the request object
     req.user = sanitizeUser(user);
     next();
+})
+
+// @desc permissions to access routes
+export const allowedTo = (...roles) =>
+    expressAsyncHandler(async (req, res, next) => {
+        if (!(roles.includes(req.user.role))) { return next(new APIerrors(`Provilege denied! You cannot perform this action`, 403)) }
+        next();
+    })
+
+export const checkActive = expressAsyncHandler(async (req, res, next) => {
+    if (!req.user.active) { return next(new APIerrors("Your account is deactivated", 403)) }
+    next()
 })
 
 export const forgetPassword = expressAsyncHandler(async (req, res, next) => {
