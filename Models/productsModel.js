@@ -32,12 +32,17 @@ const productSchema = new Schema(
             ref: "categoryModel",
             required: [true, "Category Must Be Required"],
         },
+        adminUser: {
+            type: Schema.Types.ObjectId,
+            ref: "userModel"
+        },
     },
     { timestamps: true }
 );
 
 productSchema.pre(/^find/, function (next) {
     this.populate({ path: 'category', select: 'name' });
+    this.populate({ path: 'adminUser', select: '_id name' });
     next();
 })
 

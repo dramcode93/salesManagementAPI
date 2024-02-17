@@ -13,7 +13,17 @@ const categorySchema = new Schema(
             type: String,
             lowercase: true
         },
+        adminUser: {
+            type: Schema.Types.ObjectId,
+            ref: "userModel"
+        },
     },
     { timestamps: true }
 );
+
+categorySchema.pre(/^find/, function (next) {
+    this.populate({ path: 'adminUser', select: '_id name' });
+    next();
+})
+
 export default model("categoryModel", categorySchema);

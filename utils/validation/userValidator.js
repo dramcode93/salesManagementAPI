@@ -53,12 +53,13 @@ export const createUserValidator = [
     check("name")
         .notEmpty().withMessage(" User Name is Required")
         .isLength({ min: 2, max: 50 }).withMessage("Name should be 2 : 50 char ")
+        .custom((value) => userModel.findOne({ name: value }).then((user) => { if (user) { return Promise.reject(new Error("This username has already been taken")); } }))
         .custom((val, { req }) => {
             req.body.slug = slugify(val);
             return true;
         }),
     check("email")
-        .notEmpty().withMessage("Email is Required")
+        .optional()
         .isEmail().withMessage("InValid Email Address")
         .custom((val) =>
             userModel.findOne({ email: val }).then((userModel) => {
@@ -94,14 +95,14 @@ export const updateUserValidator = [
                 if (userModel) { return Promise.reject(new Error("Email already in user")); }
             })
         ),
+    check('active')
+        .optional()
+        .isBoolean().withMessage('Active field must be Boolean'),
     validatorMiddleware,
 ];
 
 export const changeUserPasswordValidator = [
     check("id").isMongoId().withMessage("Invalid Id"),
-    body("currentPassword")
-        .notEmpty().withMessage(" You Must Enter Your current Password")
-        .isLength({ min: 6, max: 14 }).withMessage("Password must be at least 6 char and at most 14 char"),
     body("passwordConfirmation")
         .notEmpty().withMessage("You Must Enter Password Confirm")
         .isLength({ min: 6, max: 14 }).withMessage("Password Confirmation must be at least 6 char and at most 14 char"),
@@ -111,8 +112,6 @@ export const changeUserPasswordValidator = [
         .custom(async (val, { req }) => {
             const user = await userModel.findById(req.params.id);
             if (!user) { throw new Error("there is No User For This Id"); }
-            const isCorrectPassword = await bcrypt.compare(req.body.currentPassword, user.password);
-            if (!isCorrectPassword) { throw new Error("InCorrect Current Password"); }
             if (val != req.body.passwordConfirmation) { throw new Error("Passwords do not match"); }
             return true;
         }),
