@@ -1,16 +1,20 @@
 import { Router } from "express";
 import { allProductCat, addSubProductNest, createProduct, AllProduct, ProductId, updateProduct, deleteProduct, AllProductList } from '../controllers/product.js'
 import { createProductValidator, deleteProductValidator, getProductValidator, updateProductValidator } from '../utils/validation/productValidator.js';
-import { protectRoutes } from '../controllers/auth.js';
+import { allowedTo, checkActive, protectRoutes } from '../controllers/auth.js';
 
 const router = new Router({ mergeParams: true });
 router.use(protectRoutes)
+router.use(checkActive)
+
 
 router.route('/')
-    .get(allProductCat, AllProduct)
-    .post(addSubProductNest, createProductValidator, createProduct)
+    .get(allowedTo('admin', 'user'), allProductCat, AllProduct)
+    .post(allowedTo('admin'), addSubProductNest, createProductValidator, createProduct)
 
-router.get('/list', allProductCat, AllProductList)
+router.get('/list', allowedTo('admin', 'user'), allProductCat, AllProductList)
+
+router.use(allowedTo('admin'))
 
 router.route('/:id')
     .get(getProductValidator, ProductId)
