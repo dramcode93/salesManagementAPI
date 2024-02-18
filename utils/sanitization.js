@@ -7,6 +7,7 @@ export const sanitizeUser = function (user) {
         active: user?.active,
         users: user.users,
         adminUser: user?.adminUser,
-        passwordResetCodeVerify: user?.passwordResetCodeVerify
+        passwordResetCodeVerify: user?.passwordResetCodeVerify,
+        createdAt: user?.createdAt,
     };
 };

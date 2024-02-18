@@ -2,17 +2,20 @@ import { Router } from "express";
 import productsRouter from './productsRoute.js'
 import { createCategory, AllCategory, categoryId, updateCategory, deleteCategory, AllCategoryList } from '../controllers/category.js'
 import { createCategoryValidator, deleteCategoryValidator, getCategoryValidator, updateCategoryValidator } from '../utils/validation/categoryValidator.js';
-import { protectRoutes } from '../controllers/auth.js';
+import { allowedTo, checkActive, protectRoutes } from '../controllers/auth.js';
 
 const router = new Router();
 router.use('/:categoryId/products', productsRouter)
 router.use(protectRoutes)
+router.use(checkActive)
 
 router.route('/')
-    .get(AllCategory)
-    .post(createCategoryValidator, createCategory)
+    .get(allowedTo('admin', 'user'), AllCategory)
+    .post(allowedTo('admin'), createCategoryValidator, createCategory)
 
-router.get('/list', AllCategoryList)
+router.get('/list', allowedTo('admin', 'user'), AllCategoryList)
+
+router.use(allowedTo('admin'))
 
 router.route('/:id')
     .get(getCategoryValidator, categoryId)

@@ -63,7 +63,7 @@ export const createUserValidator = [
         .isEmail().withMessage("InValid Email Address")
         .custom((val) =>
             userModel.findOne({ email: val }).then((userModel) => {
-                if (userModel) { return Promise.reject(new Error("Email already in user")); }
+                if (userModel) { return Promise.reject(new Error("Email already in use")); }
             })
         ),
     check("password")
