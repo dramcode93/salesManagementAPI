@@ -69,6 +69,9 @@ export const updateUser = asyncHandler(async (req, res, next) => {
     const document = await userModel.findById(req.params.id);
     if (!document) { return next(new APIerrors(`No document for this id ${req.params.id}`, 404)); }
     if (req.user.role == 'admin' && req.user._id.toString() != document.adminUser.toString()) { return next(new APIerrors("You can only change your own users"), 400); }
+    else if (req.user.role == 'manager' && document.role == 'manager' && timeCreatedUser(req.user) > timeCreatedUser(document)) {
+        return next(new APIerrors('You can not update this manager', 400));
+    }
     const updatedUser = await userModel.findByIdAndUpdate(req.params.id, {
         name: req.body?.name,
         slug: req.body?.slug,
@@ -92,6 +95,9 @@ export const changeUserPassword = asyncHandler(async (req, res, next) => {
     const document = await userModel.findById(req.params.id);
     if (!document) { return next(new APIerrors(`No document for this id ${req.params.id}`, 404)); }
     if (req.user.role == 'admin' && req.user._id.toString() != document.adminUser.toString()) { return next(new APIerrors("You can only change your own users"), 400); }
+    else if (req.user.role == 'manager' && document.role == 'manager' && timeCreatedUser(req.user) > timeCreatedUser(document)) {
+        return next(new APIerrors('You can not change this manager password', 400));
+    }
     document.password = await bcrypt.hash(req.body.password, 12);
     document.passwordChangedAt = Date.now();
     await document.save({ validateBeforeSave: false });
