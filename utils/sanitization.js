@@ -9,5 +9,6 @@ export const sanitizeUser = function (user) {
         adminUser: user?.adminUser,
         passwordResetCodeVerify: user?.passwordResetCodeVerify,
         createdAt: user?.createdAt,
+        updatedAt: user?.updatedAt,
     };
 };

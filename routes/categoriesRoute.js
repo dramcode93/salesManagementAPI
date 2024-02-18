@@ -1,6 +1,6 @@
 import { Router } from "express";
 import productsRouter from './productsRoute.js'
-import { createCategory, AllCategory, categoryId, updateCategory, deleteCategory, AllCategoryList } from '../controllers/category.js'
+import { createCategory, AllCategory, categoryId, updateCategory, deleteCategory, AllCategoryList, selectCategories } from '../controllers/category.js'
 import { createCategoryValidator, deleteCategoryValidator, getCategoryValidator, updateCategoryValidator } from '../utils/validation/categoryValidator.js';
 import { allowedTo, checkActive, protectRoutes } from '../controllers/auth.js';
 
@@ -10,10 +10,10 @@ router.use(protectRoutes)
 router.use(checkActive)
 
 router.route('/')
-    .get(allowedTo('admin', 'user'), AllCategory)
+    .get(allowedTo('admin', 'user'), selectCategories, AllCategory)
     .post(allowedTo('admin'), createCategoryValidator, createCategory)
 
-router.get('/list', allowedTo('admin', 'user'), AllCategoryList)
+router.get('/list', allowedTo('admin', 'user'), selectCategories, AllCategoryList)
 
 router.use(allowedTo('admin'))
 

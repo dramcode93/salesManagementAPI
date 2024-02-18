@@ -3,6 +3,15 @@ import { deleteOne, getAll, findOne } from '../controllers/refactorHandler.js'
 import billModel from '../Models/billsModel.js'
 import productsModel from '../Models/productsModel.js';
 
+export const selectBills = (req, res, next) => {
+    let filterData = {};
+    if (req.user.role == 'admin') { filterData = { adminUser: req.user._id } }
+    else { filterData = { adminUser: req.user.adminUser } }
+    if (req.params.id) { filterData.user = req.params.id };
+    req.filterData = filterData;
+    next();
+}
+
 //  create Bills post 
 export const createBills = expressAsyncHandler(async (req, res, next) => {
 
@@ -36,6 +45,9 @@ export const createBills = expressAsyncHandler(async (req, res, next) => {
     req.body.products = productDetails; // Update req.body.products with detailed information
     req.body.totalAmount = totalAmount;
     req.body.remainingAmount = totalAmount - req.body.paidAmount;
+    req.body.user = req.user._id;
+    if (req.user.role == 'admin') { req.body.adminUser = req.user._id; }
+    else { req.body.adminUser = req.user.adminUser; }
 
     const bill = await billModel.create(req.body)
     res.status(200).json({ data: bill })
@@ -101,6 +113,9 @@ export const updateBills = expressAsyncHandler(async (req, res) => {
         req.body.totalAmount = totalAmount;
         req.body.remainingAmount = totalAmount - req.body.paidAmount;
     }
+    req.body.user = req.user._id;
+    if (req.user.role == 'admin') { req.body.adminUser = req.user._id; }
+    else { req.body.adminUser = req.user.adminUser; }
     const updatedBill = await billModel.findByIdAndUpdate(req.params.id, req.body, { new: true })
     res.status(200).json({ data: updatedBill })
 });

@@ -14,7 +14,9 @@ export const allProductCat = (req, res, next) => {
     // nest route  (product &category)
     //  get   /api/category/:categoryId/product
     let filterData = {};
-    if (req.params.categoryId) { filterData = { category: req.params.categoryId } }
+    if (req.user.role == 'admin') { filterData = { adminUser: req.user._id } }
+    else { filterData = { adminUser: req.user.adminUser } }
+    if (req.params.categoryId) { filterData.category = req.params.categoryId };
     req.filterData = filterData;
     next();
 }
@@ -23,7 +25,7 @@ export const allProductCat = (req, res, next) => {
 export const createProduct = createOne(productModel);
 
 // view list Product get 
-export const AllProduct = getAll(productModel)
+export const AllProduct = getAll(productModel, 'productModel')
 
 // view list Product without pagination get 
 export const AllProductList = getAllList(productModel)

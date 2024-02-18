@@ -14,6 +14,7 @@ export const deleteOne = (Model) => asyncHandler(async (req, res, next) => {
 
 export const updateOne = (Model) =>
     asyncHandler(async (req, res, next) => {
+        req.body.adminUser = req.user._id; //add the user who created the resource to adminUser field in db
         const document = await Model.findByIdAndUpdate(req.params.id, req.body, { new: true, });
         if (!document) { return next(new APIerrors(`No document for this id ${req.params.id}`, 404)); }
         res.status(200).json({ data: document });
@@ -46,7 +47,7 @@ export const getAll = (Model, modelName) => asyncHandler(async (req, res) => {
         const searchData = await searchResult.mongooseQuery;
         searchLength = searchData.length;
     }
-    const documentCount = searchLength || await Model.countDocuments();
+    const documentCount = searchLength || await Model.find(filterData).countDocuments();
     const apiFeature = new ApiFeature(Model.find(filterData), req.query).filter().sort().limitFields().search(modelName).pagination(documentCount)
 
     //execute query
