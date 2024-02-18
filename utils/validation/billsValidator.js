@@ -14,9 +14,6 @@ export const createBillsValidator = [
     check("customerAddress")
         .optional()
         .isLength({ max: 200 }).withMessage("the max length of Customer Address is 200"),
-    check("sellerName")
-        .notEmpty().withMessage("Seller Name is Required")
-        .isLength({ min: 2, max: 50 }).withMessage("Seller Name Length must be between 2 and 50"),
     check("phone")
         .optional()
         .isMobilePhone("ar-EG").withMessage("InValid Phone Number only accept EG Number "),
@@ -54,9 +51,6 @@ export const updateBillValidator = [
     check("customerAddress")
         .optional()
         .isLength({ max: 200 }).withMessage("the max length of Customer Address is 200"),
-    check("sellerName")
-        .optional()
-        .isLength({ min: 2, max: 50 }).withMessage("Seller Name Length must be between 2 and 50"),
     check("phone")
         .optional()
         .isMobilePhone("ar-EG").withMessage("InValid Phone Number only accept EG Number "),

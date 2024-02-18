@@ -42,7 +42,7 @@ const productSchema = new Schema(
 
 productSchema.pre(/^find/, function (next) {
     this.populate({ path: 'category', select: 'name' });
-    this.populate({ path: 'adminUser', select: '_id name' });
+    // this.populate({ path: 'adminUser', select: '_id name' });
     next();
 })
 

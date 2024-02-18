@@ -16,13 +16,6 @@ const billSchema = new Schema({
         trim: true,
         maxlength: [200, "max length must be 150 char"],
     },
-    sellerName: {
-        type: String,
-        trim: true,
-        minlength: [2, "min length must be 2 char"],
-        maxlength: [50, "max length must be 50 char"],
-        required: [true, 'Seller Name is Required']
-    },
     phone: { type: String },
     products: [{
         product: {
@@ -56,8 +49,8 @@ const billSchema = new Schema({
 
 billSchema.pre(/^find/, function (next) {
     this.populate({ path: 'products.product', select: 'name price' });
-    this.populate({ path: 'adminUser', select: '_id name' });
     this.populate({ path: 'user', select: '_id name' });
+    this.populate({ path: 'adminUser', select: '_id name' });
     next();
 })
 

@@ -5,7 +5,6 @@ const categorySchema = new Schema(
             type: String,
             trim: true,
             required: [true, "Category Name is Required"],
-            unique: [true, "Category must be Unique"],
             minlength: [2, "min length must be 2 char"],
             maxlength: [50, "max length must be 50 char"],
         },
@@ -21,9 +20,9 @@ const categorySchema = new Schema(
     { timestamps: true }
 );
 
-categorySchema.pre(/^find/, function (next) {
-    this.populate({ path: 'adminUser', select: '_id name' });
-    next();
-})
+// categorySchema.pre(/^find/, function (next) {
+//     this.populate({ path: 'adminUser', select: '_id name' });
+//     next();
+// })
 
 export default model("categoryModel", categorySchema);
