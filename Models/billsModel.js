@@ -50,7 +50,6 @@ const billSchema = new Schema({
 billSchema.pre(/^find/, function (next) {
     this.populate({ path: 'products.product', select: 'name price' });
     this.populate({ path: 'user', select: '_id name' });
-    this.populate({ path: 'adminUser', select: '_id name' });
     next();
 })
 

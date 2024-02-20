@@ -39,13 +39,14 @@ class ApiFeature {
     search(modelName) {
         if (this.queryString.search) {
             let query = {};
-            if (modelName === "billModel") {
-                query = { customerName: { $regex: this.queryString.search, $options: "i" } }
-
+            if (modelName === "billModel") { query = { customerName: { $regex: this.queryString.search, $options: "i" } } }
+            else if (modelName === 'userModel') {
+                query.$or = [
+                    { name: { $regex: this.queryString.search, $options: "i" } },
+                    { role: { $regex: this.queryString.search, $options: "i" } },
+                ];
             }
-            else {
-                query = { name: { $regex: this.queryString.search, $options: "i" } }
-            }
+            else { query = { name: { $regex: this.queryString.search, $options: "i" } } }
             this.mongooseQuery = this.mongooseQuery.find(query)
         }
         return this;
