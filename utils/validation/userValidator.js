@@ -13,6 +13,11 @@ export const updateLoggedUserValidator = [
     check("name")
         .optional()
         .isLength({ min: 2, max: 50 }).withMessage("Name should be 2 : 50 char ")
+        .custom(async (val, { req }) => {
+            await userModel.findOne({ name: val }).then((userModel) => {
+                if (userModel && userModel._id.toString() != req.user._id) { return Promise.reject(new Error("name already in user")); }
+            })
+        })
         .custom((val, { req }) => {
             req.body.slug = slugify(val);
             return true;

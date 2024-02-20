@@ -20,9 +20,4 @@ const categorySchema = new Schema(
     { timestamps: true }
 );
 
-// categorySchema.pre(/^find/, function (next) {
-//     this.populate({ path: 'adminUser', select: '_id name' });
-//     next();
-// })
-
 export default model("categoryModel", categorySchema);
