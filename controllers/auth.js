@@ -14,7 +14,7 @@ export const login = expressAsyncHandler(async (req, res, next) => {
     if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
         return next(new APIerrors('Invalid username or password', 401))
     }
-    const token = createToken(user._id, user.role)
+    const token = createToken(user._id, user.name, user.role, user.createdAt)
     res.status(200).json({ user: sanitizeUser(user), token })
 })
 

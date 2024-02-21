@@ -54,8 +54,5 @@ userSchema.pre('save', async function (next) {
     // Hashing user password
     this.password = await bcrypt.hash(this.password, 12);
     next();
-}).pre(/^find/, function (next) {
-    this.populate({ path: 'users', select: '-password' });
-    next();
-});
+})
 export default model("userModel", userSchema);
