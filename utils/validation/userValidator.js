@@ -17,6 +17,7 @@ export const updateLoggedUserValidator = [
             await userModel.findOne({ name: val }).then((userModel) => {
                 if (userModel && userModel._id.toString() != req.user._id) { return Promise.reject(new Error("name already in user")); }
             })
+            return true;
         })
         .custom((val, { req }) => {
             req.body.slug = slugify(val);

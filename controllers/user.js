@@ -26,6 +26,7 @@ export const userId = findOne(userModel, 'userModel')
 export const updateLoggedUser = asyncHandler(async (req, res, next) => {
     const user = await userModel.findByIdAndUpdate(req.user._id, {
         name: req.body.name,
+        slug: req.body.slug,
         email: req.body.email,
     }, { new: true, });
     if (!user) { return next(new APIerrors(`No user for this id ${req.params.id}`, 404)); }
@@ -79,10 +80,10 @@ export const updateUser = asyncHandler(async (req, res, next) => {
         active: req.body?.active
     }, { new: true, });
     if (req.user.role == 'manager' && updatedUser.role == 'admin') {
-        if (req.body.active) {
+        if (req.body.active == true || req.body.active == false) {
             const adminUsers = await userModel.find({ adminUser: updatedUser._id });
             if (adminUsers) {
-                const updatePromises = adminUsers.map(async (user) => { await userModel.findByIdAndUpdate(user._id, { active: req.body.active }, { new: true }); });
+                const updatePromises = adminUsers.map(async (user) => { await userModel.findByIdAndUpdate(user._id, { active: updatedUser.active }, { new: true }); });
                 await Promise.all(updatePromises);
             }
         }
@@ -98,9 +99,9 @@ export const changeUserPassword = asyncHandler(async (req, res, next) => {
     else if (req.user.role == 'manager' && document.role == 'manager' && timeCreatedUser(req.user) > timeCreatedUser(document)) {
         return next(new APIerrors('You can not change this manager password', 400));
     }
-    document.password = await bcrypt.hash(req.body.password, 12);
+    document.password = req.body.password;
     document.passwordChangedAt = Date.now();
-    await document.save({ validateBeforeSave: false });
+    await document.save();
     res.status(200).json({ data: sanitizeUser(document) });
 });
 
