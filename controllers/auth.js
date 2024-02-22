@@ -30,6 +30,21 @@ export const protectRoutes = expressAsyncHandler(async (req, res, next) => {
     // Verify token
     const decoded = Jwt.verify(token, process.env.JWT_SECRET_KEY);
 
+    // Check if token is about to expire within the next 24 hours
+    const expirationThreshold = 24 * 60 * 60; // 24 hours in seconds
+    if (decoded.exp - Date.now() / 1000 < expirationThreshold) {
+        try {
+            // Generate a new token (refresh token logic)
+            const newToken = createToken(decoded._id, decoded.name, decoded.role, decoded.createdAt)
+            // Attach the new token to the response headers
+            // res.setHeader('Authorization', `Bearer ${newToken}`);
+            req.newToken = newToken;
+        } catch (error) {
+            console.error('Error generating new token:', error);
+            return next(new APIerrors('Failed to refresh token.', 500));
+        }
+    }
+
     // Check if user exist
     const user = await usersModel.findById(decoded._id);
     if (!user) { return next(new APIerrors('The user does not exist anymore...', 404)) }
@@ -43,6 +58,13 @@ export const protectRoutes = expressAsyncHandler(async (req, res, next) => {
     // Attach the user to the request object
     req.user = sanitizeUser(user);
     next();
+})
+
+export const refreshToken = expressAsyncHandler(async (req, res) => {
+    let newToken;
+    if (req.newToken) { newToken = req.newToken }
+    console.log(`Token Refreshed to user ${req.user.name}`);
+    res.json({ token: newToken })
 })
 
 // @desc permissions to access routes

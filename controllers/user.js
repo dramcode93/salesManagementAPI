@@ -30,7 +30,8 @@ export const updateLoggedUser = asyncHandler(async (req, res, next) => {
         email: req.body.email,
     }, { new: true, });
     if (!user) { return next(new APIerrors(`No user for this id ${req.params.id}`, 404)); }
-    res.status(200).json({ message: 'your Data updated successfully', data: sanitizeUser(user) });
+    const token = createToken(user._id, user.name, user.role, user.createdAt)
+    res.status(200).json({ message: 'your Data updated successfully', data: sanitizeUser(user), token });
 });
 
 export const updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
